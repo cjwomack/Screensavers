@@ -1,15 +1,15 @@
-import pyautogui
+from random import *
 import win32gui
 import win32api
-import time
 
 # variable for memory
 dc = win32gui.GetDC(0)
 
-def distributeColor():
+def rainbowGenerator():
 	# CREATES A RAINBOW ARRAY
 
 	colors = []
+
 	# green emerges on top of red
 	for i in range(256):
 		newColor = win32api.RGB(255, i, 0)
@@ -29,38 +29,33 @@ def distributeColor():
 	for i in range(1, 256):
 		newColor = win32api.RGB(0, 255 - i, 255)
 		colors.append(newColor)
+
+	return colors
+
+def colorGenerator():
+	# GENERATES AN ARRAY OF COLORS
+
+	rainbowColors = rainbowGenerator()
+	randomColors = []
+	for i in range(len(rainbowColors)):
+		r = randint(0,255)
+		g = randint(0,255)
+		b = randint(0,255)
+		rgb = win32api.RGB(r,g,b)
+		randomColors.append(rgb)
+	
+	# There is a 1% chance that the screen will be a rainbow palette
+	random = randint(1,100)
+	if (random == 1):
+		colors = rainbowColors
+	else:
+		colors = randomColors
 	
 	# add a reversed list (without first and last index) to current list
 	for i in range(1,1020):
 		colors.append(colors[i*-1])
 	
 	return colors
-
-def snapshot():
-	# CAPTURES THE CURRENT SCREEN
-
-	# HOW TO USE:
-	# The returned list contains x amount of lists, where x is the number of pixel columns. 
-	# Those lists contain y amount of lists, where y is the number of pixel rows. 
-	# Those lists contain the RGB value as index 0, x value as index 1, and y value as index 2. 
-
-	# declare stuff
-	x = 1919
-	y = 1079
-	image = []
-
-	# for each column of pixels, add a list that contains data on the row of those column of pixels.
-	for i in range(x):
-		ylist = []
-		for j in range(y):
-			temp = []
-			pixel = win32gui.GetPixel(dc,x,y)
-			temp.append(pixel)
-			temp.append(i)
-			temp.append(j)
-			ylist.append(temp)
-		image.append(ylist)
-	return(image)
 
 def errorCover(colors):
 	# COVERS SCREEN IN AN ERROR-LIKE RAINBOW PALETTE
@@ -80,29 +75,19 @@ def errorCover(colors):
 				counter = 0
 
 			win32gui.SetPixel(dc, i, j, color)
-
-def screenRecover(image):
-	# RECOVERS SCREEN FROM ERROR PALETTE
-
-	for x in image:
-		for pixelData in x:
-			# check snapshot() description to understand index values
-			win32gui.SetPixel(dc, pixelData[1], pixelData[2], pixelData[0])
 	
 def main():
-
-	# create a rainbow array
-	colors = distributeColor()
-	
-	# capture current screen state
-	image = snapshot()
+	# Screen dimensions
+	x = 1920
+	y = 1080
 
 	while(True):
+
+		# pick color palette
+		colors = colorGenerator()
+
 		# cover screen in error
 		errorCover(colors)
-
-		# recover screen from error
-		screenRecover(image)	
 
 if __name__ == "__main__":
     main()
