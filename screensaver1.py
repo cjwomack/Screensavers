@@ -6,10 +6,6 @@ import time
 # variable for memory
 dc = win32gui.GetDC(0)
 
-# screen resolution variables (full HD)
-x = 1920
-y = 1080
-
 def distributeColor():
 	# CREATES A RAINBOW ARRAY
 
@@ -48,7 +44,11 @@ def snapshot():
 	# Those lists contain y amount of lists, where y is the number of pixel rows. 
 	# Those lists contain the RGB value as index 0, x value as index 1, and y value as index 2. 
 
+	# declare stuff
+	x = 1919
+	y = 1079
 	image = []
+
 	# for each column of pixels, add a list that contains data on the row of those column of pixels.
 	for i in range(x):
 		ylist = []
@@ -62,10 +62,14 @@ def snapshot():
 		image.append(ylist)
 	return(image)
 
-def errorCover():
+def errorCover(colors):
 	# COVERS SCREEN IN AN ERROR-LIKE RAINBOW PALETTE
 
+	# declare stuff
+	x = 1919
+	y = 1079
 	counter = 0
+
 	for i in range(x):
 		for j in range(y):
 			color = colors[counter]
@@ -77,7 +81,7 @@ def errorCover():
 
 			win32gui.SetPixel(dc, i, j, color)
 
-def screenRecover():
+def screenRecover(image):
 	# RECOVERS SCREEN FROM ERROR PALETTE
 
 	for x in image:
@@ -95,10 +99,10 @@ def main():
 
 	while(True):
 		# cover screen in error
-		errorCover()
+		errorCover(colors)
 
 		# recover screen from error
-		screenRecover()	
+		screenRecover(image)	
 
 if __name__ == "__main__":
     main()
