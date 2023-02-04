@@ -11,49 +11,45 @@ def rainbowGenerator():
 	colors = []
 
 	# green emerges on top of red
-	for i in range(256):
-		newColor = win32api.RGB(255, i, 0)
-		colors.append(newColor)
+	colors += [(255, i, 0) for i in range(256)] 
 
 	# red diminishes before green
-	for i in range(1, 256):
-		newColor = win32api.RGB(255 - i, 255, 0)
-		colors.append(newColor)
+	colors += [(254 - i, 255, 0) for i in range(255)]
 
 	# blue emerges on top of green
-	for i in range(1, 256):
-		newColor = win32api.RGB(0, 255, i)
-		colors.append(newColor)
+	colors += [(0, 255, i + 1) for i in range(256)]
 
 	# green diminishes before blue
-	for i in range(1, 256):
-		newColor = win32api.RGB(0, 255 - i, 255)
-		colors.append(newColor)
+	colors += [(0, 254 - i, 255) for i in range(255)]
 
 	return colors
 
+def rainbowActualGenerator():
+	for index in range(1021):
+		if index < 256: # .. 255
+			yield (255, index, 0)
+		elif 256 <= index < 511: # 256 .. 510
+			yield (510 - index, 255, 0)
+		elif 511 <= index < 766: # 511 ... 766
+			yield (0, 255, (index - 510))
+		elif 766 <= index < 1021:
+			yield (0, 1020 - index, 255)
+			
+
 def colorGenerator():
 	# GENERATES AN ARRAY OF COLORS
+        gen = rainbowActualGenerator()
+	rainbowColors = [next(gen) for i in range(1021)]
+	randomColors = [(randint(0,255), randint(0,255), randint(0,255)) for i in range(len(rainbowColors))]
 
-	rainbowColors = rainbowGenerator()
-	randomColors = []
-	for i in range(len(rainbowColors)):
-		r = randint(0,255)
-		g = randint(0,255)
-		b = randint(0,255)
-		rgb = win32api.RGB(r,g,b)
-		randomColors.append(rgb)
 	
 	# There is a 1% chance that the screen will be a rainbow palette
-	random = randint(1,100)
-	if (random == 1):
-		colors = rainbowColors
-	else:
-		colors = randomColors
+	colors = rainbowColors if randint(1,100) == 1 else randomColors
 	
 	# add a reversed list (without first and last index) to current list
-	for i in range(1,1020):
-		colors.append(colors[i*-1])
+	colors += colors[:1020:-1]
+	#for i in range(1,1020):
+	#	colors.append(colors[i*-1])
 	
 	return colors
 
@@ -74,7 +70,7 @@ def errorCover(colors):
 			else:
 				counter = 0
 
-			win32gui.SetPixel(dc, i, j, color)
+			win32gui.SetPixel(dc, i, j, win32api.RGB(*color))
 	
 def main():
 	# Screen dimensions
